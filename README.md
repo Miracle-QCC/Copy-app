@@ -51,7 +51,7 @@ xcrun notarytool store-credentials ClipStackNotary \
 
 SIGN_IDENTITY="Developer ID Application: 你的名称 (TEAMID)" \
 NOTARY_PROFILE="ClipStackNotary" \
-./scripts/build-notarized-dmg.sh 1.2.2
+./scripts/build-notarized-dmg.sh 1.2.3
 ```
 
 公证成功后，`spctl` 会接受该 DMG，其他用户从网络下载后可直接打开。
