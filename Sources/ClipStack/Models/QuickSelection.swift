@@ -2,9 +2,15 @@ import Foundation
 
 struct QuickSelection {
     private(set) var selectedID: ClipboardItem.ID?
+    /// Tracks what drove the most recent selection change so the view can decide
+    /// whether it should auto-scroll. Keyboard navigation needs to keep the
+    /// selected row on screen, while mouse hover must not move the list (doing so
+    /// shifts a new row under the cursor and causes runaway scrolling).
+    private(set) var lastChangeSource: ChangeSource = .programmatic
 
     mutating func reset(items: [ClipboardItem]) {
         selectedID = items.first?.id
+        lastChangeSource = .programmatic
     }
 
     mutating func hover(itemID: ClipboardItem.ID, items: [ClipboardItem]) {
@@ -12,11 +18,13 @@ struct QuickSelection {
             return
         }
         selectedID = itemID
+        lastChangeSource = .hover
     }
 
     mutating func move(_ direction: QuickSelectionDirection, items: [ClipboardItem]) {
         guard !items.isEmpty else {
             selectedID = nil
+            lastChangeSource = .keyboard
             return
         }
 
@@ -27,6 +35,15 @@ struct QuickSelection {
         case .down:
             selectedID = items[min(items.count - 1, currentIndex + 1)].id
         }
+        lastChangeSource = .keyboard
+    }
+}
+
+extension QuickSelection {
+    enum ChangeSource {
+        case programmatic
+        case hover
+        case keyboard
     }
 }
 

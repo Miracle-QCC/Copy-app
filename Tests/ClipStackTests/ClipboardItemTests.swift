@@ -38,6 +38,34 @@ struct ClipboardItemTests {
     }
 
     @Test
+    func hoverIsNotTreatedAsKeyboardNavigation() {
+        let first = ClipboardItem(type: .text, text: "第一条")
+        let second = ClipboardItem(type: .text, text: "第二条")
+        let items = [first, second]
+        var selection = QuickSelection()
+
+        selection.reset(items: items)
+        selection.hover(itemID: second.id, items: items)
+
+        // Hovering must not request auto-scroll, otherwise the list moves under
+        // the cursor and scrolls on its own as the mouse rests in place.
+        #expect(selection.lastChangeSource == .hover)
+    }
+
+    @Test
+    func keyboardNavigationRequestsAutoScroll() {
+        let first = ClipboardItem(type: .text, text: "第一条")
+        let second = ClipboardItem(type: .text, text: "第二条")
+        let items = [first, second]
+        var selection = QuickSelection()
+
+        selection.reset(items: items)
+        selection.move(.down, items: items)
+
+        #expect(selection.lastChangeSource == .keyboard)
+    }
+
+    @Test
     func keyboardSelectionMovesAndStopsAtListBounds() {
         let first = ClipboardItem(type: .text, text: "第一条")
         let second = ClipboardItem(type: .text, text: "第二条")

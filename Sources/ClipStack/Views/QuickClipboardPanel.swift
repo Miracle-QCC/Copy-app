@@ -173,10 +173,15 @@ private struct QuickClipboardView: View {
                         .padding(10)
                     }
                     .onChange(of: selection.selectedID) {
-                        if let selectedItemID = selection.selectedID {
-                            withAnimation(.easeOut(duration: 0.12)) {
-                                proxy.scrollTo(selectedItemID, anchor: .center)
-                            }
+                        // Only follow keyboard navigation. Auto-scrolling on hover
+                        // would move the list under the cursor and cause runaway
+                        // scrolling as the mouse simply rests in place.
+                        guard selection.lastChangeSource == .keyboard,
+                              let selectedItemID = selection.selectedID else {
+                            return
+                        }
+                        withAnimation(.easeOut(duration: 0.12)) {
+                            proxy.scrollTo(selectedItemID, anchor: .center)
                         }
                     }
                 }
